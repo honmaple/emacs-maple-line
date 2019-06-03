@@ -1,0 +1,18 @@
+* emacs-maple-line
+** screenshots
+   [[https://github.com/honmaple/emacs-maple-line/blob/master/screenshot/example.png]]
+   [[https://github.com/honmaple/emacs-maple-line/blob/master/screenshot/example1.png]]
+** How to use
+   #+begin_src bash
+   git clone https://github.com/honmaple/emacs-maple-line ~/.emacs.d/site-lisp/maple-line
+   #+end_src
+
+   #+begin_src elisp
+     (use-package maple-line
+       :ensure nil
+       :commands (maple-line-mode)
+       :config
+       (setq maple-line-display-alist '((side . bottom)
+                                         (slot . 0)
+                                         (window-height . 1)))
+   #+end_src
