@@ -10,7 +10,7 @@
    #+begin_src elisp
      (use-package maple-line
        :ensure nil
-       :commands (maple-line-mode)
+       :hook (after-init . maple-line-mode))
        :config
        (setq maple-line-display-alist '((side . bottom)
                                          (slot . 0)
