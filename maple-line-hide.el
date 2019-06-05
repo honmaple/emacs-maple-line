@@ -64,7 +64,7 @@
   "maple line mode"
   :group      'maple-line
   (if maple-line-hide-mode
-      (let* ((face (list :height 0.1 :underline maple-line-hide-underline-color))
+      (let* ((face (list :box nil :height 0.1 :underline maple-line-hide-underline-color))
              (line (unless maple-line-hide-underline
                      (setq maple-line-hide-alist
                            (list (face-remap-add-relative 'mode-line face)
