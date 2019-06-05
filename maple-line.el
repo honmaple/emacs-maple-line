@@ -25,8 +25,9 @@
 
 ;;; Code:
 (require 'subr-x)
+(require 'maple-line-hide)
 
-(defvar maple-line-name "*modeline*")
+(defvar maple-line-name "*maple-line*")
 (defvar maple-line-format nil)
 
 (defgroup maple-line nil
@@ -91,30 +92,24 @@
     (insert (format-mode-line maple-line-format))
     (read-only-mode 1)))
 
-(defun maple-line-hide ()
+(defun maple-line-mode-off ()
   "Hide maple line."
   (interactive)
   (when-let ((window (maple-line-window)))
     (delete-window window))
-  (window-divider-mode -1)
-  (setq mode-line-format maple-line-format)
-  (setq-default mode-line-format maple-line-format)
+  (global-maple-line-hide-mode -1)
   (remove-hook 'post-command-hook 'maple-line-update))
 
-(defun maple-line-show ()
+(defun maple-line-mode-on ()
   "Show maple line."
   (interactive)
-  (maple-line-hide-mode-line)
+  (setq maple-line-format mode-line-format)
+  (global-maple-line-hide-mode 1)
   (maple-line-with-buffer
-    (maple-line-refresh)
     (maple-line-buffer-configure)
+    (maple-line-refresh)
     (maple-line-window-configure))
   (add-hook 'post-command-hook 'maple-line-update))
-
-(defun maple-line ()
-  "Toggle open and close."
-  (interactive)
-  (if (maple-line-window) (maple-line-hide) (maple-line-show)))
 
 (defun maple-line-update (&rest _args)
   "Update maple line."
@@ -123,24 +118,14 @@
       (maple-line-refresh)
       (maple-line-window-configure))))
 
-(defun maple-line-hide-mode-line()
-  "Hide mode line."
-  (setq maple-line-format mode-line-format)
-  ;; (set-face-attribute 'mode-line nil :height 0.1)
-  ;; (set-face-attribute 'mode-line-inactive nil :height 0.1)
-  (setq mode-line-format nil)
-  (setq-default mode-line-format nil)
-  (when (boundp 'window-divider-mode)
-    (setq window-divider-default-places 'bottom-only
-          window-divider-default-bottom-width 1)
-    (window-divider-mode 1)))
-
 ;;;###autoload
 (define-minor-mode maple-line-mode
   "maple line mode"
   :group      'maple-line
   :global     t
-  (if maple-line-mode (maple-line-show) (maple-line-hide)))
+  (if maple-line-mode (maple-line-mode-on) (maple-line-mode-off)))
+
+(add-to-list 'maple-line-hide-ignore maple-line-name)
 
 (provide 'maple-line)
 ;;; maple-line.el ends here

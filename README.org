@@ -16,3 +16,17 @@
                                          (slot . 0)
                                          (window-height . 1)))
    #+end_src
+   
+   #+begin_src elisp
+     (use-package maple-line-hide
+       :ensure nil
+       :hook (after-init . global-maple-line-hide-mode)
+       :config
+       (setq maple-line-hide-underline t
+             maple-line-hide-underline-color "red"
+             maple-line-hide-ignore '("*scratch*" "^magit" python-mode)))
+
+     (use-package maple-line-hide
+       :ensure nil
+       :hook (prog-mode . maple-line-hide-mode))
+   #+end_src
