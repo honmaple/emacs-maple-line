@@ -32,8 +32,13 @@
   "Hide modeline mode."
   :group 'maple)
 
-(defcustom maple-line-hide-underline nil
+(defcustom maple-line-hide-underline t
   "Whether hide mode-line but show underline."
+  :group 'maple-line-hide
+  :type 'boolean)
+
+(defcustom maple-line-hide-underline-below nil
+  "Whether show below window's underline."
   :group 'maple-line-hide
   :type 'boolean)
 
@@ -59,24 +64,34 @@
           (when (and (stringp regex) (string-match regex (buffer-name)))
             (throw 'ignored t))))))
 
+(defun maple-line-hide-ignore-underline-p(&optional window)
+  "Ignore current WINDOW's underline."
+  (not (when maple-line-hide-underline (if maple-line-hide-underline-below t (window-in-direction 'below window)))))
+
 ;;;###autoload
 (define-minor-mode maple-line-hide-mode
   "maple line mode"
   :group      'maple-line
   (if maple-line-hide-mode
-      (let* ((face (list :box nil :height 0.1 :underline maple-line-hide-underline-color))
-             (line (unless maple-line-hide-underline
-                     (setq maple-line-hide-alist
-                           (list (face-remap-add-relative 'mode-line face)
-                                 (face-remap-add-relative 'mode-line-inactive face)))
-                     "")))
+      (let* ((face (list :box nil :height 0.1 :underline maple-line-hide-underline-color)))
+        (setq maple-line-hide-alist (list (face-remap-add-relative 'mode-line face)
+                                          (face-remap-add-relative 'mode-line-inactive face)))
         (setq maple-line-hide-format mode-line-format
-              mode-line-format line))
+              mode-line-format (unless (maple-line-hide-ignore-underline-p) " "))
+        (add-hook 'window-configuration-change-hook 'maple-line-hide-set-window-underline))
     (setq mode-line-format maple-line-hide-format
           maple-line-hide-format nil)
-    (unless maple-line-hide-underline
-      (dolist (face-remap maple-line-hide-alist)
-        (face-remap-remove-relative face-remap)))))
+    (dolist (face-remap maple-line-hide-alist)
+      (face-remap-remove-relative face-remap))
+    (setq maple-line-hide-alist nil)
+    (remove-hook 'window-configuration-change-hook 'maple-line-hide-set-window-underline)))
+
+(defun maple-line-hide-set-window-underline()
+  "Ignore some buffer or major mode."
+  (dolist (window (window-list))
+    (with-selected-window window
+      (when maple-line-hide-mode
+        (setq mode-line-format (unless (maple-line-hide-ignore-underline-p) " "))))))
 
 (define-globalized-minor-mode global-maple-line-hide-mode maple-line-hide-mode
   (lambda() (unless (maple-line-hide-ignore-p) (maple-line-hide-mode 1))))
